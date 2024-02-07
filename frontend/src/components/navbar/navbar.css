@@ -1,0 +1,37 @@
+.navNavbar {
+    overflow: hidden;
+    background: linear-gradient(-135deg, #c850c0, #4158d0);
+}
+
+.navNavbar > * {
+    float: right;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+.navigation {
+    overflow: hidden;
+    background: linear-gradient(-135deg, #c850c0, #4158d0);
+}
+
+.navLeft > * {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+
+.navRight > *{
+    float: right;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+}

@@ -1,0 +1,86 @@
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Popins', sans-serif;
+}
+
+html{
+    background: #f2f2f2;
+}
+
+.bodyUser{
+    display: grid;
+    height: 100%;
+    margin-top: 5%;
+    place-items: center;
+    background: #f2f2f2;
+}
+
+.wrapper{
+    width: 380px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0px 15px 20px rgba(0,0,0,0.1);
+
+}
+
+.wrapper .title{
+    color: #fff;
+    line-height: 100px;
+    font-weight: 600;
+    text-align: center;
+    line-height: 100px;
+    border-radius: 15px 15px 0 0;
+    background: linear-gradient(-135deg, #c850c0, #4158d0);
+}
+
+.wrapper form{
+    padding: 20px 30px;
+}
+
+.wrapper form .field{
+    position: relative;
+    height: 50px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.wrapper form .field input{
+    height: 100%;
+    width: 100%;
+    padding-left: 15px;
+    outline: none;
+    border-radius: 25px;
+    border: 1px solid silver;
+    transition: all;
+}
+
+.wrapper form .field input:focus{
+    border-color: #4158d0;
+}
+
+.wrapper form .field label{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 20px;
+    color: #999;
+    font-size: 17px;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.wrapper form .field input:focus ~ label,
+.wrapper form .field input:valid ~ label{
+    top: 0%;
+    color: #4158d0;
+    font-size: 16px;
+    background-color: #fff;
+    transform: translateY(-50%);
+}
+
+.wrapper form .error{
+    margin: 8px 0 0 10px;
+}
