@@ -18,7 +18,6 @@ export default function Groups() {
         return () => {
             window.removeEventListener("beforeunload", handleBeforeUnload);
             // Disconnect Socket.IO when component unmounts
-            socket.disconnect();
         };
     }, []);
 
