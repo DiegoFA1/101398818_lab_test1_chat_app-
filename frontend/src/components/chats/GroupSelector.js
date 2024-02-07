@@ -20,6 +20,7 @@ export default class Groups extends Component {
     const data = {
       username: this.username,
     }
+    localStorage.setItem('groupName', group);
     axios.post(`http://localhost:8090/chat/joinGroup/${group}`, data);
     io('http://localhost:8090').emit('join', this.username, group);
 
@@ -41,7 +42,7 @@ export default class Groups extends Component {
               </li>
             </div>
             <div className='chatfield'>
-              <li onClick={() => this.handleGroupSelect('cloud computing')}  >
+              <li onClick={() => this.handleGroupSelect('cloud_computing')}  >
                 <Link to={`/group/cloud_computing`}>Cloud computing</Link>
               </li>
             </div>

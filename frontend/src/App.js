@@ -20,6 +20,10 @@ function App() {
     console.log('Location changed:', location.pathname);
   }, [location]);
 
+  
+
+
+
   return (
     <div className="App">
       <NavBar />

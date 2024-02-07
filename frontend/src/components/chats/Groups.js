@@ -1,49 +1,95 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from "react-router-dom";
-import io from 'socket.io-client'; // Import Socket.IO client
+import io from 'socket.io-client';
+import './ChatStyle.css';
 
 export default function Groups() {
     const [messages, setMessages] = useState([]);
     const { groupName } = useParams();
-    const socket = io("http://localhost:8090"); // Initialize Socket.IO client
+    const socket = io("http://localhost:8090");
+    socket.on("connect", () => {
+        console.log("Connected to the server");
+    }); 
 
     useEffect(() => {
-        // Fetch messages when the component mounts
         getMessages();
-
-        window.addEventListener("beforeunload", handleBeforeUnload);
-
-        // Clean up function to remove event listener when component unmounts
+    
+        socket.on("chatMessage", handleIncomingMessage);
+        socket.on("join", handleUserJoined); 
+        socket.on("groupLeft", handleUserJoined);
+    
         return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-            // Disconnect Socket.IO when component unmounts
+            socket.off("chatMessage", handleIncomingMessage);
+            socket.off("join", handleUserJoined);
+            socket.off("groupLeft", handleUserJoined);
         };
     }, []);
+    
 
     function getMessages() {
         axios.get(`http://localhost:8090/chat/messages/${groupName}`)
             .then(response => {
-                setMessages(response.data.map(messageObject => messageObject.message));
+                setMessages(response.data);
             })
             .catch(error => {
                 console.log(error);
             });
     }
 
-    function handleBeforeUnload(event) {
-        // send a message to the server when the user leaves the page with username and group
-        socket.emit("groupLeft", (localStorage.getItem("username"), groupName));
+    function sendMessage(message) {
+        axios.post(`http://localhost:8090/chat/messages/${groupName}`, {
+            message: message,
+            from_user: localStorage.getItem("username")
+        })
+        .then(response => {
+            console.log(response);
+            getMessages();
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    }
+
+    function handleIncomingMessage(message) {
+        setMessages(prevMessages => [...prevMessages, message]);
+    }
+
+    function handleUserJoined(username) {
+        console.log(`${username} joined the group`);
+        // Fetch messages again when a new user joins
+        getMessages();
     }
 
     return (
-        <div>
-            <h2>Group: {groupName}</h2>
-            <ul>
-                {messages.map((message, index) => (
-                    <li key={index}>{message}</li>
-                ))}
-            </ul>
+        <div className='bodyChat'>
+            <div className="chatwrapper">
+                <div className="chattitle">
+                    <h2>Group: {groupName}</h2>
+                </div>
+                <ul>
+                    {messages.map((message, index) => (
+                        <li className='lichat' key={index}>{message.message}</li>
+                    ))}
+                </ul>
+
+                <input type="text" id="message" placeholder="Type a message..." />
+                <button onClick={() => {
+                    const message = document.getElementById("message").value;
+                    sendMessage(message);
+                    socket.emit("chatMessage", {
+                        message: message,
+                        username: localStorage.getItem("username"),
+                        groupName: groupName
+                    });
+                }}>Send</button>
+                <button onClick={() => {
+                    localStorage.removeItem("groupName");
+                    socket.emit("groupLeft", localStorage.getItem("username"), groupName);
+                    window.location.href = "/groups";
+                }}>Leave Group</button>
+
+            </div>
         </div>
     );
 }

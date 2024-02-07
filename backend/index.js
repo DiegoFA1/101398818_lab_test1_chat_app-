@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const userRoutes = require('./routes/UserRoutes');
 const chatRoutes = require('./routes/ChatRoutes');
-
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
@@ -13,6 +12,7 @@ const io = require('socket.io')(server, {
   }
 });
 
+var groupMessage = require('./models/GroupMessage')
 // Configure CORS for Express
 app.use(cors({
   origin: '*'
@@ -40,19 +40,28 @@ io.on('connection', (socket) => {
   });
 
   socket.on('chatMessage', (message) => {
-    console.log('Received message:', message);
-    io.emit('message', message);
+    console.log('Socket received message:', message);
+    io.emit('chatMessage', message.message);
   });
 
   socket.on('join', (userData, group) => {
     console.log(`User ${userData} joined group ${group}`);
     socket.join(group);
+    io.emit('join', userData);
+  });
 
-    socket.on('groupLeft', (userData,group) => {
-      console.log(`User ${userData} left group ${group}`);
-      socket.leave(group);
+  socket.on('groupLeft', (userData,group) => {
+    console.log(`User ${userData} left group ${group}`);
+    socket.leave(group);
+
+    // Create a message for the guy leaving
+    const message = new groupMessage({
+      from_user: userData,
+      message: userData + ' Left the group',
+      date_sent: new Date(),
+      room: group
     });
-  
+    message.save();
 
   });
 

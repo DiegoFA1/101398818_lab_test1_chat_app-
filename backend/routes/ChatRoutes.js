@@ -11,7 +11,7 @@ routes.route("/messages/:group")
     })
 
 // Save message for group
-routes.route("/saveGroupMessage/:group")
+routes.route("/messages/:group")
     .post(async (req,res)=>{
         const group = req.params.group
         const message = new groupMessage(req.body)

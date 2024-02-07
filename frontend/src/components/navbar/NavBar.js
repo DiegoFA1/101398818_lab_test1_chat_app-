@@ -11,6 +11,7 @@ export default class NavBar extends Component {
 
     render() {
         const user = localStorage.getItem('username');
+        const groupName = localStorage.getItem('groupName');
 
         if (user === null) {
             return (
@@ -19,7 +20,19 @@ export default class NavBar extends Component {
                     <Link to="/">Login</Link>
                 </nav>
             );
-        } else {
+        } 
+        else if (groupName !== null){
+            return (
+                <div className='navigation'>
+                    <nav className='navRight'>
+                        <Link to="/" onClick={this.logout}>Logout</Link>
+                        <p>This user is Logged In: {user}</p>
+                    </nav>
+                </div>
+            );
+        }
+        
+        else {
             return (
                 <div className='navigation'>
                     <nav className='navLeft'>
