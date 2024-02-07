@@ -27,7 +27,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/groups" element={<GroupSelector />} />
-        <Route path="/group/:groupId" element={<Groups />} />
+        <Route path="/group/:groupName" element={<Groups />} />
         <Route path="/private" element={<PrivateChat />} />
       </Routes>
     </div>

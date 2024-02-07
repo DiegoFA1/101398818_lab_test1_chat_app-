@@ -5,10 +5,8 @@ import io from 'socket.io-client';
 
 export default class NavBar extends Component {
     logout = () => {
-        io('http://localhost:8090').emit('disconnect');
         localStorage.clear();
         window.location.href = '/';
-        
     }
 
     render() {

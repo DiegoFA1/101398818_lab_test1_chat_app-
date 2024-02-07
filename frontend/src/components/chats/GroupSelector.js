@@ -2,21 +2,26 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import './ChatStyle.css';
 import io from 'socket.io-client'; // Import socket.io-client
+import axios from 'axios';
 
 export default class Groups extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedGroup: null,
+      selectedGroup: null
     };
-   
+
+    this.username = localStorage.getItem('username');
+
   }
 
   handleGroupSelect = (group) => {
     this.setState({ selectedGroup: group });
-    //get socket from local storage
-    io('http://localhost:8090').emit('join', group);
-
+    const data = {
+      username: this.username,
+    }
+    axios.post(`http://localhost:8090/chat/joinGroup/${group}`, data);
+    io('http://localhost:8090').emit('join', this.username, group);
 
   };
 
@@ -55,7 +60,6 @@ export default class Groups extends Component {
                 <Link to={`/group/nodeJS`}>nodeJS</Link>
               </li>
             </div>
-            {/* Add more groups as needed */}
           </ul>
         </div>
       </div>

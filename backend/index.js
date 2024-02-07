@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const userRoutes = require('./routes/UserRoutes');
+const chatRoutes = require('./routes/ChatRoutes');
 
 const app = express();
 const http = require('http');
@@ -13,10 +14,13 @@ const io = require('socket.io')(server, {
 });
 
 // Configure CORS for Express
-app.use(cors());
+app.use(cors({
+  origin: '*'
+}));
 
 app.use(express.json());
 app.use('/user', userRoutes);
+app.use('/chat', chatRoutes);
 
 // MongoDB connection
 mongoose.connect('mongodb+srv://diego:dvD48hSyLDBEsNxX@cluster0.ma52oy9.mongodb.net/labtest', {
@@ -40,15 +44,19 @@ io.on('connection', (socket) => {
     io.emit('message', message);
   });
 
-  socket.on('join', (group) => {
-    console.log(`User joined group ${group}`);
+  socket.on('join', (userData, group) => {
+    console.log(`User ${userData} joined group ${group}`);
     socket.join(group);
 
-    socket.on('chatMessage', (message) => {
-      console.log('Received message:', message);
-      io.to(group).emit('message', message);
+    socket.on('groupLeft', (userData,group) => {
+      console.log(`User ${userData} left group ${group}`);
+      socket.leave(group);
     });
+  
+
   });
+
+  
 });
 
 

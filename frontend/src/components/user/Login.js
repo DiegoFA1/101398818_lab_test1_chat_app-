@@ -31,9 +31,6 @@ export default function Login({ socket }) {
                     // Emit 'userLoggedIn' event to the server
                     socket.emit('userLoggedIn', { username: response.data.username });
                 });
-
-                // save the socket in the local storage
-                localStorage.setItem('socket', socket);
                 navigate('/groups'); // Navigate to the specified route
             }
             console.log(response);
