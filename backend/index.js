@@ -30,25 +30,29 @@ mongoose.connect('mongodb+srv://diego:dvD48hSyLDBEsNxX@cluster0.ma52oy9.mongodb.
 
 // Socket.IO logic
 io.on('connection', (socket) => {
-  console.log('A user connected');
-
-  // Handle chat messages
-  socket.on('chatMessage', (message) => {
-    console.log('Received message:', message);
-    // Broadcast the message to all connected clients (except the sender)
-    socket.broadcast.emit('message', message);
-  });
-
   socket.on('userLoggedIn', (userData) => {
     console.log(`User ${userData.username} logged in`);
     io.emit('userLoggedIn', userData);
   });
 
-  // Handle disconnect event
-  socket.on('disconnect', () => {
-    console.log('A user disconnected');
+  socket.on('chatMessage', (message) => {
+    console.log('Received message:', message);
+    io.emit('message', message);
+  });
+
+  socket.on('join', (group) => {
+    console.log(`User joined group ${group}`);
+    socket.join(group);
+
+    socket.on('chatMessage', (message) => {
+      console.log('Received message:', message);
+      io.to(group).emit('message', message);
+    });
   });
 });
+
+
+
 
 const SERVER_PORT = 8090;
 server.listen(SERVER_PORT, () => {

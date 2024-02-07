@@ -1,0 +1,40 @@
+ul{
+    list-style-type: none;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+li{
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    border-bottom: 1px solid #f0f0f0;
+    height: 50px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+li a{
+    text-decoration: none;
+    color: black;
+}
+
+li a:hover{
+    background: #f0f0f0;
+}
+
+.bodyChat{
+    display: grid;
+    height: 100%;
+    margin-top: 5%;
+    place-items: center;
+    background: #f2f2f2;
+}
+
+.wrapper form .chatfield{
+    position: relative;
+    height: 50px;
+    width: 100%;
+    margin-top: 20px;
+}

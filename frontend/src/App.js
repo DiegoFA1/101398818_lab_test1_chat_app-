@@ -1,6 +1,10 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import io from 'socket.io-client';
+import Groups from './components/chats/Groups';
+import PrivateChat from './components/chats/PrivateChat';
+import GroupSelector from './components/chats/GroupSelector';
+
 
 // Nav bar
 import NavBar from './components/navbar/NavBar';
@@ -22,6 +26,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/groups" element={<GroupSelector />} />
+        <Route path="/group/:groupId" element={<Groups />} />
+        <Route path="/private" element={<PrivateChat />} />
       </Routes>
     </div>
   );

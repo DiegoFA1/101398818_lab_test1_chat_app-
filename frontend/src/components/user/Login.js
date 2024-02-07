@@ -32,7 +32,9 @@ export default function Login({ socket }) {
                     socket.emit('userLoggedIn', { username: response.data.username });
                 });
 
-                navigate('/employee/list'); // Navigate to the specified route
+                // save the socket in the local storage
+                localStorage.setItem('socket', socket);
+                navigate('/groups'); // Navigate to the specified route
             }
             console.log(response);
         } catch (error) {

@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import './navbar.css';
+import io from 'socket.io-client'; 
 
 export default class NavBar extends Component {
     logout = () => {
+        io('http://localhost:8090').emit('disconnect');
         localStorage.clear();
         window.location.href = '/';
+        
     }
 
     render() {
@@ -22,8 +25,8 @@ export default class NavBar extends Component {
             return (
                 <div className='navigation'>
                     <nav className='navLeft'>
-                        <Link to="">Group Chats</Link>
-                        <Link to="">Private Chats</Link>
+                        <Link to="/groups">Group Chats</Link>
+                        <Link to="/private">Private Chats</Link>
                     </nav>
                     <nav className='navRight'>
                         <Link to="/" onClick={this.logout}>Logout</Link>
