@@ -35,7 +35,7 @@ routes.route("/login")
         const username = req.body.username
 
         if (!username) {
-            return res.status(400).json({ status: false, message: "Username or email is required" });
+            return res.status(400).json({ status: false, message: "Username is required" });
           }
 
         // get user from database

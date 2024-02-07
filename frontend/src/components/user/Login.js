@@ -1,110 +1,86 @@
+import React, { useState } from 'react';
 import axios from 'axios';
-import React, { Component } from 'react'
+import { useNavigate } from 'react-router-dom';
+import io from 'socket.io-client';
 
+export default function Login({ socket }) {
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        username: '',
+        password: '',
+        error: ''
+    });
 
-export default class Login extends Component {
-    
-    constructor(props) {
-        super(props);
-        this.state = {
-            username: '',
-            password: '',
-            error: ''
-        }
-        
+    const { username, password, error } = formData;
+
+    const onValueChanged = (event) => {
+        setFormData({ ...formData, [event.target.name]: event.target.value, error: '' });
     }
-  
-    onValueChanged = (event) => {
-        event.preventDefault()
-        this.setState({
-            [event.target.name]: event.target.value,
-            error: ''
-        })
-    }
-  
-    onSubmitForm = async (event) => {
-        event.preventDefault()
-        const { username, password} = this.state
-        const data = {
-            username,
-            password,
-        }
+
+    const onSubmitForm = async (event) => {
+        event.preventDefault();
+        const data = { username, password };
         try {
             const response = await axios.post('http://localhost:8090/user/login', data);
-            // Check if the response returns any data
             if (response.data) {
                 localStorage.setItem('username', response.data.username);
-                window.location.href = '/employee/list';
                 
-            }
-            console.log(response);
-            // If the response has data, then we will store the token in localStorage
+                const socket = io('http://localhost:8090');
+                socket.on('connect', () => {
+                    console.log('Connected to Socket.IO server');
+                    // Emit 'userLoggedIn' event to the server
+                    socket.emit('userLoggedIn', { username: response.data.username });
+                });
 
-            
+                navigate('/employee/list'); // Navigate to the specified route
+            }
             console.log(response);
         } catch (error) {
             console.error(error);
             if (error.response && error.response.data) {
-                this.setState({ error: error.response.data.message });
+                setFormData({ ...formData, error: error.response.data.message });
             } else {
-                this.setState({ error: 'An unexpected error occurred.' });
+                setFormData({ ...formData, error: 'An unexpected error occurred.' });
             }
         }
     }
-  
-  
-  
-  render = () => {
-    const { error } = this.state;
-    
-    
+
     return (
-        
         <div className='bodyUser'>
-        <div className="wrapper">
-            
-            <div className="title">
-            <h1>User Login</h1>
+            <div className="wrapper">
+                <div className="title">
+                    <h1>User Login</h1>
+                </div>
+                <form onSubmit={onSubmitForm}>
+                    <div className="field">
+                        <input
+                            required
+                            name='username'
+                            type="text"
+                            value={username}
+                            onChange={onValueChanged} />
+                        <label>Username</label>
+                    </div>
+                    <div className="field">
+                        <input
+                            required
+                            name='password'
+                            type="password"
+                            value={password}
+                            onChange={onValueChanged} />
+                        <label>Password</label>
+                    </div>
+                    <div className="field">
+                        <input
+                            name='btnSubmit'
+                            type="submit"
+                            value="Login" />
+                    </div>
+                    <div className="error">
+                        {error && <p style={{ color: 'red' }}>{error}</p>}
+                    </div>
+                </form>
             </div>
-            <form onSubmit={(e) => this.onSubmitForm(e)} > 
-                <div className="field">
-                    <input 
-                        required
-                        name='username'
-                        type="text"
-                        onChange={(e) => this.onValueChanged(e)}  />
-                    <label>Username</label>
-  
-                </div>
-  
-                <div className="field">
-                    <input 
-                        required
-                        name='password'
-                        type="password"
-                        onChange={(e) => this.onValueChanged(e)} />
-                    <label>Password</label>
-                </div>
-                <div className="field">
-                    <input 
-                        name='btnSubmit'
-                        type="submit"
-                        value="Login" />
-                </div>
-                <div className="error">
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                </div>
-            </form>
         </div>
-    </div>
-    )
-  }
-
-
-
-
-
-
-
-
+    );
 }
