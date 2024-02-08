@@ -9,19 +9,36 @@ export default function Groups() {
     const [inputMessage, setInputMessage] = useState('');
     const { groupName } = useParams();
     const socket = io("http://localhost:8090");
-    socket.on("chatMessage", handleIncomingMessage);
-    socket.on("join", handleIncomingMessage); 
-    socket.on("groupLeft", handleIncomingMessage);
 
     useEffect(() => {
+        getMessages();
 
-        // Cleanup socket event subscriptions when component unmounts
+        socket.on("chatMessage", handleChatMessage);
+        socket.on("join", handleUserJoin);
+        socket.on("groupLeft", handleUserLeft);
+
+        // Clean up function to remove event listeners when component unmounts
         return () => {
-            socket.off("chatMessage", handleIncomingMessage);
-            socket.off("join", handleIncomingMessage);
-            socket.off("groupLeft", handleIncomingMessage);
+            socket.off("chatMessage", handleChatMessage);
+            socket.off("join", handleUserJoin);
+            socket.off("groupLeft", handleUserLeft);
         };
-    }, []);
+    }, []); 
+
+    const handleChatMessage = (message) => {
+        setMessages(prevMessages => [...prevMessages, message]);
+        console.log("Client- Message received: ", message);
+    };
+
+    const handleUserJoin = (userData) => {
+        setMessages(prevMessages => [...prevMessages, {from_user: userData, message: userData + " Joined the group"}]);
+        console.log("Client- User joined: ", userData);
+    };
+
+    const handleUserLeft = (message) => {
+        setMessages(prevMessages => [...prevMessages, message]);
+        console.log("Client- User left: ", message);
+    };
 
     async function getMessages() {
         try {
@@ -32,34 +49,21 @@ export default function Groups() {
         }
     }
 
-    function sendMessage() {
-        // Emit message through socket
-        socket.emit("chatMessage", {
+    async function sendMessage() {
+        const messageData = {
             message: inputMessage,
             from_user: localStorage.getItem("username"),
             groupName: groupName
-        });
+        };
 
-        // Reset input
-        setInputMessage('');
-
-        // Post message through axios
-        axios.post(`http://localhost:8090/chat/messages/${groupName}`, {
-            message: inputMessage,
-            from_user: localStorage.getItem("username")
-        })
-        .then(response => {
-            // Refresh messages
+        try {
+            socket.emit("chatMessage", messageData);
+            await axios.post(`http://localhost:8090/chat/messages/${groupName}`, messageData);
             getMessages();
-            console.log(response);
-        })
-        .catch(error => {
+            setInputMessage('');
+        } catch (error) {
             console.log(error);
-        });
-    }
-
-    function handleIncomingMessage() {
-        getMessages();
+        }
     }
 
     function handleInputChange(event) {

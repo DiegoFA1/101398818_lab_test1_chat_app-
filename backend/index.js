@@ -36,25 +36,25 @@ mongoose.connect('mongodb+srv://diego:dvD48hSyLDBEsNxX@cluster0.ma52oy9.mongodb.
 io.on('connection', (socket) => {
   socket.on('userLoggedIn', (userData) => {
     console.log(`User ${userData.username} logged in`);
+
     io.emit('userLoggedIn', userData);
   });
 
   socket.on('chatMessage', (message) => {
     console.log('Socket received message:', message);
+
     io.emit('chatMessage', message);
   });
 
   socket.on('join', (userData, group) => {
     console.log(`User ${userData} joined group ${group}`);
-    socket.join(group);
     io.emit('join', userData);
   });
 
+
   socket.on('groupLeft', (userData,group) => {
     console.log(`User ${userData} left group ${group}`);
-    socket.leave(group);
-
-    // Create a message for the guy leaving
+    
     const message = new groupMessage({
       from_user: userData,
       message: userData + ' Left the group',
@@ -62,9 +62,8 @@ io.on('connection', (socket) => {
       room: group
     });
     message.save();
-
-    io.to(group).emit('groupLeft', message);
-
+    io.emit('groupLeft', message);
+    
   });
 
   
