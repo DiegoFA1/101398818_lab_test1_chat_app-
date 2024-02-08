@@ -8,7 +8,7 @@ export default function Groups() {
     const [messages, setMessages] = useState([]);
     const [inputMessage, setInputMessage] = useState('');
     const { groupName } = useParams();
-    const socket = io("http://localhost:8090");
+    const socket = io("https://socksapp-4a5c68e8d8a8.herokuapp.com");
     socket.on("chatMessage", handleIncomingMessage);
     socket.on("join", handleIncomingMessage); 
     socket.on("groupLeft", handleIncomingMessage);
@@ -25,7 +25,7 @@ export default function Groups() {
 
     async function getMessages() {
         try {
-            const response = await axios.get(`http://localhost:8090/chat/messages/${groupName}`);
+            const response = await axios.get(`https://socksapp-4a5c68e8d8a8.herokuapp.com/chat/messages/${groupName}`);
             setMessages(response.data);
         } catch (error) {
             console.log(error);
@@ -44,7 +44,7 @@ export default function Groups() {
         setInputMessage('');
 
         // Post message through axios
-        axios.post(`http://localhost:8090/chat/messages/${groupName}`, {
+        axios.post(`https://socksapp-4a5c68e8d8a8.herokuapp.com/chat/messages/${groupName}`, {
             message: inputMessage,
             from_user: localStorage.getItem("username")
         })

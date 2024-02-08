@@ -32,7 +32,7 @@ export default class Signup extends Component {
             password
         }
         try {
-            const response = await axios.post('http://localhost:8090/user/signup', data);
+            const response = await axios.post('https://socksapp-4a5c68e8d8a8.herokuapp.com', data);
             // Check if the response returns any data
             if (response.data) {
                 alert('User added successfully')

@@ -21,11 +21,11 @@ export default function Login({ socket }) {
         event.preventDefault();
         const data = { username, password };
         try {
-            const response = await axios.post('http://localhost:8090/user/login', data);
+            const response = await axios.post('https://socksapp-4a5c68e8d8a8.herokuapp.com/user/login', data);
             if (response.data) {
                 localStorage.setItem('username', response.data.username);
                 
-                const socket = io('http://localhost:8090');
+                const socket = io('https://socksapp-4a5c68e8d8a8.herokuapp.com');
                 socket.on('connect', () => {
                     console.log('Connected to Socket.IO server');
                     // Emit 'userLoggedIn' event to the server
