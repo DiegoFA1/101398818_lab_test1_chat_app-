@@ -21,8 +21,8 @@ export default class Groups extends Component {
       username: this.username,
     }
     localStorage.setItem('groupName', group);
-    axios.post(`http://localhost:8090/chat/joinGroup/${group}`, data);
-    io('http://localhost:8090').emit('join', this.username, group);
+    axios.post(`https://socksapp-4a5c68e8d8a8.herokuapp.com/chat/joinGroup/${group}`, data);
+    io('https://socksapp-4a5c68e8d8a8.herokuapp.com').emit('join', this.username, group);
 
   };
 
