@@ -6,59 +6,70 @@ import './ChatStyle.css';
 
 export default function Groups() {
     const [messages, setMessages] = useState([]);
+    const [inputMessage, setInputMessage] = useState('');
     const { groupName } = useParams();
     const socket = io("http://localhost:8090");
-    socket.on("connect", () => {
-        console.log("Connected to the server");
-    }); 
+    socket.on("chatMessage", handleIncomingMessage);
+    socket.on("join", handleIncomingMessage); 
+    socket.on("groupLeft", handleIncomingMessage);
 
     useEffect(() => {
-        getMessages();
-    
-        socket.on("chatMessage", handleIncomingMessage);
-        socket.on("join", handleUserJoined); 
-        socket.on("groupLeft", handleUserJoined);
-    
+
+        // Cleanup socket event subscriptions when component unmounts
         return () => {
             socket.off("chatMessage", handleIncomingMessage);
-            socket.off("join", handleUserJoined);
-            socket.off("groupLeft", handleUserJoined);
+            socket.off("join", handleIncomingMessage);
+            socket.off("groupLeft", handleIncomingMessage);
         };
     }, []);
-    
 
-    function getMessages() {
-        axios.get(`http://localhost:8090/chat/messages/${groupName}`)
-            .then(response => {
-                setMessages(response.data);
-            })
-            .catch(error => {
-                console.log(error);
-            });
+    async function getMessages() {
+        try {
+            const response = await axios.get(`http://localhost:8090/chat/messages/${groupName}`);
+            setMessages(response.data);
+        } catch (error) {
+            console.log(error);
+        }
     }
 
-    function sendMessage(message) {
+    function sendMessage() {
+        // Emit message through socket
+        socket.emit("chatMessage", {
+            message: inputMessage,
+            from_user: localStorage.getItem("username"),
+            groupName: groupName
+        });
+
+        // Reset input
+        setInputMessage('');
+
+        // Post message through axios
         axios.post(`http://localhost:8090/chat/messages/${groupName}`, {
-            message: message,
+            message: inputMessage,
             from_user: localStorage.getItem("username")
         })
         .then(response => {
-            console.log(response);
+            // Refresh messages
             getMessages();
+            console.log(response);
         })
         .catch(error => {
             console.log(error);
         });
     }
 
-    function handleIncomingMessage(message) {
-        setMessages(prevMessages => [...prevMessages, message]);
+    function handleIncomingMessage() {
+        getMessages();
     }
 
-    function handleUserJoined(username) {
-        console.log(`${username} joined the group`);
-        // Fetch messages again when a new user joins
-        getMessages();
+    function handleInputChange(event) {
+        setInputMessage(event.target.value);
+    }
+
+    function leaveGroup() {
+        localStorage.removeItem("groupName");
+        socket.emit("groupLeft", localStorage.getItem("username"), groupName);
+        window.location.href = "/groups";
     }
 
     return (
@@ -69,25 +80,21 @@ export default function Groups() {
                 </div>
                 <ul>
                     {messages.map((message, index) => (
-                        <li className='lichat' key={index}>{message.message}</li>
+                        <li className='lichat' key={index}>{message.from_user + ": " + message.message }</li>
                     ))}
                 </ul>
 
-                <input type="text" id="message" placeholder="Type a message..." />
-                <button onClick={() => {
-                    const message = document.getElementById("message").value;
-                    sendMessage(message);
-                    socket.emit("chatMessage", {
-                        message: message,
-                        username: localStorage.getItem("username"),
-                        groupName: groupName
-                    });
-                }}>Send</button>
-                <button onClick={() => {
-                    localStorage.removeItem("groupName");
-                    socket.emit("groupLeft", localStorage.getItem("username"), groupName);
-                    window.location.href = "/groups";
-                }}>Leave Group</button>
+                <input 
+                    type="text" 
+                    id="message" 
+                    placeholder="Type a message..."
+                    value={inputMessage}
+                    onChange={handleInputChange}
+                />
+
+                <button onClick={sendMessage}>Send</button>
+
+                <button onClick={leaveGroup}>Leave Group</button>
 
             </div>
         </div>

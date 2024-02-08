@@ -41,7 +41,7 @@ io.on('connection', (socket) => {
 
   socket.on('chatMessage', (message) => {
     console.log('Socket received message:', message);
-    io.emit('chatMessage', message.message);
+    io.emit('chatMessage', message);
   });
 
   socket.on('join', (userData, group) => {
@@ -62,6 +62,8 @@ io.on('connection', (socket) => {
       room: group
     });
     message.save();
+
+    io.to(group).emit('groupLeft', message);
 
   });
 
